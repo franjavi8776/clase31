@@ -1,123 +1,188 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Vue</title>
-        <!-- Required meta tags -->
-        <meta charset="utf-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  <head>
+    <title>Vue</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div class="container my5" id="app">
+      <h3 class="text-center">ver: {{mostrar}}</h3>
+      <br />
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          v-model="mostrar"
+          value="form"
         />
-
-        <!-- Bootstrap CSS v5.2.1 -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-            crossorigin="anonymous"
+        <label class="form-check-label" for="">Form</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          v-model="mostrar"
+          value="list"
         />
-    </head>
+        <label class="form-check-label" for="">List</label>
+      </div>
 
-    <body>
-        <div class="container my5" id="app">
-            <h3 class="text-center">ver: {{mostrar}}</h3>
-            <br>
-            <div class="form-check form-check-inline">
-                <input
-                    class="form-check-input"
-                    type="radio"
-                   v-model="mostrar"
-                    value="form"
-                />
-                <label class="form-check-label" for="">Form</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input
-                    class="form-check-input"
-                    type="radio"
-                    v-model="mostrar"
-                    value="list"
-                />
-                <label class="form-check-label" for="">List</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input
-                    class="form-check-input"
-                    type="radio"
-                    v-model="mostrar"
-                    value="all"
-                />
-                <label class="form-check-label" for="">All</label>
-            </div>
-
-            <div v-if='mostrar === "form" || mostrar === "all"' class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Formulario de registro</h5>
-                    contenido aqui...
-                </div>
-            </div>
-            <div v-if='mostrar === "list" || mostrar === "all"' class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Listado</h5>
-                    contenido aqui...
-                </div>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="col-4">
-                    <ul class="list-group">
-                        <li v-for="item in usuarios" class="list-group-item d-flex justify-content-between">
-                            <span>{{item.name}}</span>
-                            <small class="text-end">{{item.username}}</small>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title text-center">Chat - {{con.name}}</h5>
-                            <div class="row">
-                                <div class="col-8">
-                                   Aqui mensaje amigo
-                                </div>
-                                <div class="col-8 text-end">
-                                    Aqui mi mensaje
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div v-if='mostrar === "form"' class="card">
+        <div class="card-body">
+          <h5 class="card-title">Formulario de registro</h5>
+          <input
+            v-model="username"
+            type="email"
+            class="form-control"
+            placeholder="username"
+          />
+          <input
+            v-model="password"
+            type="password"
+            class="form-control my-3"
+            placeholder="password"
+          />
+          <button @click="registrar()" class="btn btn-primary">
+            Registrar
+          </button>
         </div>
+      </div>
+      <div v-else class="card">
+        <div class="card-body">
+          <h5 class="card-title">Listado</h5>
+          contenido aqui...
+        </div>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="col-4">
+          <ul class="list-group">
+            <li
+              v-for="item in usuarios"
+              class="list-group-item d-flex justify-content-between"
+            >
+              <span>{{item.name}}</span>
+              <small class="text-end">{{item.username}}</small>
+            </li>
+          </ul>
+        </div>
+        <div class="col-8">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">Chat - {{contacto.name}}</h5>
+              <div class="row justify-content-center">
+                <div class="col-8">
+                  <div class="alert alert-primary" role="alert">
+                    Aqui mensaje de contacto
+                  </div>
+                </div>
+                <div class="col-8 text-end">
+                  <div class="alert alert-success" role="alert">
+                    Aqui mi mensaje
+                  </div>
+                </div>
+              </div>
+              <textarea
+                v-model="mensaje"
+                class="form-control"
+                placeholder="Menjase..."
+              ></textarea>
+              <div class="text-center">
+                <button @click="enviar()" class="btn btn-primary mt-3">
+                  Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <!-- Bootstrap JavaScript Libraries -->
-        <script
-            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-            crossorigin="anonymous"
-        ></script>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
 
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-            crossorigin="anonymous"
-        ></script>
-        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-        <script>
-            const {createApp, ref} = Vue;
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+      const { createApp, ref } = Vue;
+      const { createClient } = supabase;
 
-            createApp({
-                setup() {
-                    let mostrar = ref("form")
-                    const usuarios = ref([])
-                    let con = ref({})
-                    return{
-                       mostrar,
-                       usuarios,
-                       con
-                    }
-                }
-            }).mount("#app")
-        </script>
-    </body>
+      createApp({
+        setup() {
+          const supabase = createClient(
+            "https://vmjkvqgvtjauoibbcexr.supabase.co",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtamt2cWd2dGphdW9pYmJjZXhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5ODE3OTAsImV4cCI6MjA0MTU1Nzc5MH0.WL8TLQGqxCLGZLSP4mYRpdC_VGoyO8Z02EXo2Rxn02M"
+          );
+          // para manejo del formulario y listado
+          let mostrar = ref("form");
+          // manejo de inputs del formulario
+          let username = ref("");
+          let password = ref("");
+          // guardado de la respuesta data.user
+          const user = ref({});
+          // para guardado de usuarios
+          const usuarios = ref([]);
+          // para guardado de contactos
+          const contacto = ref({});
+          // manejo de textarea
+          let mensaje = ref("");
+          // para guardado de mensajes
+          const mensajes = ref([]);
+
+          // registrar un usuario
+          const registrar = async () => {
+            const { data, error } = await supabase.auth.signUp({
+              email: username.value,
+              password: password.value,
+            });
+            if (error) {
+              console.log(error);
+            } else {
+              user.value = data.user;
+              localStorage.setItem("user", JSON.stringify(user.value));
+              console.log(data);
+            }
+          };
+
+          const enviar = () => {};
+
+          return {
+            mostrar,
+            usuarios,
+            contacto,
+            mensaje,
+            mensajes,
+            enviar,
+            registrar,
+            username,
+            password,
+            user,
+          };
+        },
+      }).mount("#app");
+    </script>
+  </body>
 </html>
