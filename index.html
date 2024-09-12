@@ -19,98 +19,67 @@
   </head>
 
   <body>
-    <div class="container my5" id="app">
-      <h3 class="text-center">ver: {{mostrar}}</h3>
-      <br />
-      <div class="form-check form-check-inline">
-        <input
-          class="form-check-input"
-          type="radio"
-          v-model="mostrar"
-          value="form"
-        />
-        <label class="form-check-label" for="">Form</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input
-          class="form-check-input"
-          type="radio"
-          v-model="mostrar"
-          value="list"
-        />
-        <label class="form-check-label" for="">List</label>
+    <div id="app" class="container my-5">
+
+      <div v-if="user.username == null" class="card">
+          <div class="card-body">
+              <h5 class="card-title">Formulario de registro / login</h5>
+              <input v-model="username" type="email" class="form-control m-2" placeholder="Email" >
+              <input v-model="password" type="password" class="form-control m-2" placeholder="Password" >
+              <button @click="registrar()" class="btn btn-primary btn-sm m-2">Registrar</button>
+              <button @click="login()" class="btn btn-primary btn-sm m-2">Ingresar</button>
+          </div>
       </div>
 
-      <div v-if='mostrar === "form"' class="card">
-        <div class="card-body">
-          <h5 class="card-title">Formulario de registro</h5>
-          <input
-            v-model="username"
-            type="email"
-            class="form-control"
-            placeholder="username"
-          />
-          <input
-            v-model="password"
-            type="password"
-            class="form-control my-3"
-            placeholder="password"
-          />
-          <button @click="registrar()" class="btn btn-primary">
-            Registrar
-          </button>
-        </div>
-      </div>
-      <div v-else class="card">
-        <div class="card-body">
-          <h5 class="card-title">Listado</h5>
-          contenido aqui...
-        </div>
-      </div>
-      <hr />
-      <div class="row">
-        <div class="col-4">
-          <ul class="list-group">
-            <li
-              v-for="item in usuarios"
-              class="list-group-item d-flex justify-content-between"
-            >
-              <span>{{item.name}}</span>
-              <small class="text-end">{{item.username}}</small>
-            </li>
-          </ul>
-        </div>
-        <div class="col-8">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title text-center">Chat - {{contacto.name}}</h5>
-              <div class="row justify-content-center">
-                <div class="col-8">
-                  <div class="alert alert-primary" role="alert">
-                    Aqui mensaje de contacto
-                  </div>
-                </div>
-                <div class="col-8 text-end">
-                  <div class="alert alert-success" role="alert">
-                    Aqui mi mensaje
-                  </div>
-                </div>
-              </div>
-              <textarea
-                v-model="mensaje"
-                class="form-control"
-                placeholder="Menjase..."
-              ></textarea>
-              <div class="text-center">
-                <button @click="enviar()" class="btn btn-primary mt-3">
-                  Enviar
-                </button>
-              </div>
-            </div>
+      <div v-if="user.username != null" class="row">
+          <div class="col-md-12 text-center">
+              <h3>Conectado como: <b>{{ user.nombres }}</b></h3>
           </div>
-        </div>
+          <div class="col-md-4 border-right">
+              <!-- listado de usuarios  -->
+              <ul class="list-group">
+                  <li v-for="item in usuarios" @click="seleccionarContacto(item)" class="list-group-item d-flex gap-2">
+                      <img :src="'https://ui-avatars.com/api/?name=' + item.nombres + '&background=ffc107&color=fff'"
+                          class="img-fluid rounded-3" alt="Img" width="40px">
+                      <span class="text-left">{{ item.nombres }} <br>
+                          <small class="text-xs">@{{ item.username }}</small>
+                      </span>
+                      <span>
+                          &nbsp;
+                      </span>
+                  </li>
+              </ul>
+          </div>
+          <div class="col-md-8">
+              <!-- los chats  -->
+              <div class="card">
+                  <div class="card-body">
+                      <h5 class="card-title text-center">Chat - {{ contacto.nombres }}</h5>
+
+                      <div v-for="item in mensajes" class="row justify-content-center">
+                          <div v-if="item.emisor_id != user.id" class="col-md-8">
+                              <div class="alert alert-primary" role="alert">
+                                  {{item.mensaje}}
+                              </div>
+                          </div>
+                          <div v-else class="col-md-8 text-end">
+                              <div class="alert alert-success" role="alert">
+                                  {{item.mensaje}}
+                              </div>
+                          </div>
+                      </div>
+
+                      <textarea v-model="mensaje" class="form-control" placeholder="Mensaje..."></textarea>
+                      <div class="text-center mt-3">
+                          <button @click="enviar()" class="btn btn-primary btn-sm">Enviar</button>
+                      </div>
+
+                  </div>
+              </div>
+          </div>
       </div>
-    </div>
+  </div>
+
 
     <!-- Bootstrap JavaScript Libraries -->
     <script
@@ -162,12 +131,115 @@
               console.log(error);
             } else {
               user.value = data.user;
+
+              const { error } = await supabase
+                        .from('users')
+                        .insert({
+                            nombres: "Francisco Villarroel",
+                            username: "frajavi8776",
+                            email: username.value,
+                            auth_id: user.value.id
+                        })
+
+              //console.log(error);
+
+
+              user.value.nombres="Francisco Villarroel"
+              user.value.username = "franjavi8776"
+
               localStorage.setItem("user", JSON.stringify(user.value));
-              console.log(data);
+              //console.log(data.user);
+
+              listarUsuarios()
             }
           };
 
-          const enviar = () => {};
+          const login = async() => {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: username.value,
+                password: password.value,
+                })
+
+                if(error){
+                    console.log(error);
+
+                }else {
+                    user.value = data.user;
+
+                    const {data:response,error} = await supabase
+                                .from('users')
+                                .select()
+                                .eq("auth_id", user.value.id)
+
+
+
+
+                     if (error) {
+                        console.log(error);
+
+                     } else {
+                        //console.log(response[0]);
+
+                        user.value.nombres = response[0].nombres
+                        user.value.username = response[0].username
+                        localStorage.setItem("user", JSON.stringify(user.value))
+                     }
+
+                }
+                listarUsuarios()
+                //listarMensajes()
+
+          }
+
+          const listarUsuarios = async() => {
+            const {data, error} = await supabase
+                                      .from("users")
+                                      .select()
+            if(error) {
+              console.log(error);
+
+            }else{
+              //console.log(data);
+              usuarios.value = data
+
+            }
+          }
+
+          const seleccionarContacto = async (usuario) => {
+            contacto.value = usuario
+
+            const {data,error} = await supabase
+                                    .from("mensajes")
+                                    .select()
+
+            if(error) {
+              console.log(error);
+
+            } else {
+              console.log(data);
+              mensajes.value = data;
+
+            }
+          }
+
+          const enviar = async() => {
+            if(contacto.value.auth_id === null || contacto.value.auth_id === "" || mensaje.value === ""){
+              alert("Por favor complete los campos vacios")
+              return;
+            }
+
+            const { error } = await supabase
+                        .from('mensajes')
+                        .insert({
+                            mensaje: mensaje.value,
+                            receptor_id: contacto.value.auth_id,
+                            emisor_id: user.value.id,
+
+                        })
+
+              console.log(error)
+              mensaje.value = "";
+          };
 
           return {
             mostrar,
@@ -177,6 +249,8 @@
             mensajes,
             enviar,
             registrar,
+            login,
+            seleccionarContacto,
             username,
             password,
             user,
