@@ -120,6 +120,7 @@
           let mensaje = ref("");
           // para guardado de mensajes
           const mensajes = ref([]);
+          let suscripcion = ref(null)
 
           // registrar un usuario
           const registrar = async () => {
@@ -210,14 +211,23 @@
           const seleccionarContacto = async (usuario) => {
             contacto.value = usuario
 
-           cargarMensajes();
+           cargarMensaje();
 
-           setInterval(()=>{
-               cargarMensajes()
-           },3000)
+          //  setInterval(()=>{
+          //      cargarMensaje()
+          //  },3000)
+
+          suscripcion.value = supabase.channel("mensajes")
+                                                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes' }, payload => {
+                                                    mensajes.value.push(payload.new);
+                                                })
+                                                .subscribe();
+
           }
 
-          const cargarMensajes = async() => {
+
+
+          const cargarMensaje = async() => {
              const {data, error} = await supabase
                                    .from("mensajes")
                                    .select()
@@ -250,6 +260,7 @@
 
               console.log(error)
               mensaje.value = "";
+              //cargarMensaje()
           };
 
           return {
