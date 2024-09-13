@@ -127,6 +127,8 @@
               email: username.value,
               password: password.value,
             });
+            //console.log(data);
+
             if (error) {
               console.log(error);
             } else {
@@ -208,18 +210,27 @@
           const seleccionarContacto = async (usuario) => {
             contacto.value = usuario
 
-            const {data,error} = await supabase
-                                    .from("mensajes")
-                                    .select()
+           cargarMensajes();
 
-            if(error) {
-              console.log(error);
+           setInterval(()=>{
+               cargarMensajes()
+           },3000)
+          }
 
-            } else {
-              console.log(data);
-              mensajes.value = data;
+          const cargarMensajes = async() => {
+             const {data, error} = await supabase
+                                   .from("mensajes")
+                                   .select()
+                                   .or(`and(emisor_id.eq.${user.value.id},receptor_id.eq.${receptor.value.auth_id}),and(emisor_id.eq.${receptor.value.auth_id},receptor_id.eq.${user.value.id})`)
+                                   .order("id",{ascending: false})
+                                   .limit(10)
 
-            }
+              if(error){
+                console.log(error);
+
+              } else {
+                mensajes.value =data.reverse();
+              }
           }
 
           const enviar = async() => {
